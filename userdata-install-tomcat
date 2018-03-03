@@ -1,4 +1,4 @@
-cd /home/ec2-user/microcero
+cd /home/ec2-user/microqoder
 ./install-tomcat
 sleep 60
 aws configure set s3.signature_version s3v4   #required for KMS encrypted objects
