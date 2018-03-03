@@ -26,9 +26,9 @@ Resources:
             -
               - "#!/bin/bash -ex\n"
               - "yum install git -y\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microcero'\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microcero; ./userdata-install-awslogs'\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microcero; ./userdata-install-tomcat "
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microqoder'\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-awslogs'\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-tomcat "
               - Ref: BucketName 
               - "/"
               - Ref: ObjectKey

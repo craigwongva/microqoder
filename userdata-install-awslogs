@@ -1,0 +1,12 @@
+sudo yum update -y
+sudo yum install -y awslogs
+
+
+cd /home/ec2-user/microcero
+
+sudo cp awscli.conf  /etc/awslogs/
+#causes awslogs/python? to not work: sudo cp awslogs.conf /etc/awslogs/
+sudo sed -i "s#/var/log/messages#/usr/share/tomcat7/logs/catalina.out#" /etc/awslogs/awslogs.conf
+sudo sed -i "s/log_group_name = .*$/log_group_name = oveja/" /etc/awslogs/awslogs.conf
+sudo service awslogs start
+
