@@ -1,0 +1,20 @@
+{
+  "Parameters" : 
+  {
+    "ObjectKey":   { "Fn::GetArtifactAtt" : ["BagArtifact", "ObjectKey"]},
+    "BucketName" : { "Fn::GetArtifactAtt" : ["BagArtifact", "BucketName"]}
+  },
+  "Tags" : {
+    "Department" : "Marketing"
+  },
+  "StackPolicy" : {
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "NotAction" : "Update:Delete",
+        "Principal": "*",
+        "Resource" : "*"
+      }
+    ]
+  }
+}
