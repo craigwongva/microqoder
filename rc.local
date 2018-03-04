@@ -6,4 +6,6 @@
 
 touch /var/lock/subsys/local
 
+touch /tmp/rc-local-`date "+%Y.%m.%d-%H.%M.%S"
+`
 sudo -u ec2-user bash -c 'cd /home/ec2-user; /home/ec2-user/microqoder/after-start'
