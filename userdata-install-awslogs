@@ -3,10 +3,6 @@ touch /tmp/userdata-install-awslogs-`date "+%Y.%m.%d-%H.%M.%S"`
 sudo yum update -y
 sudo yum install -y awslogs
 
-#Set up start instance.
-cd /home/ec2-user/microqoder
-sudo cp rc.local /etc/rc.d/rc.local
-
 cd /home/ec2-user/microqoder
 
 sudo cp awscli.conf  /etc/awslogs/

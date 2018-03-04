@@ -1,4 +1,0 @@
-sudo service awslogs start
-sleep 10
-sudo service tomcat7 start
-
