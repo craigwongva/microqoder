@@ -11,6 +11,6 @@ phases:
 
 artifacts:
   files:
-    - microqoder/target/Qoder-0.1.war
+    - microqoder/target/Roder-0.1.war
     - microqoder/appspec.yml
   discard-paths: yes    

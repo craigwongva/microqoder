@@ -1,5 +1,5 @@
 version: 0.0
 os: linux
 files:
-  - source: Qoder-0.1.war.xxx
+  - source: Roder-0.1.war
     destination: /usr/share/tomcat7/webapps/irnoffel
