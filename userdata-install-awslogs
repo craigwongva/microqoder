@@ -1,7 +1,6 @@
-touch /tmp/userdata-install-awslogs-`date "+%Y.%m.%d-%H.%M.%S"`
-
 sudo yum update -y
 sudo yum install -y awslogs
+
 
 cd /home/ec2-user/microqoder
 
@@ -10,4 +9,3 @@ sudo cp awscli.conf  /etc/awslogs/
 sudo sed -i "s#/var/log/messages#/usr/share/tomcat7/logs/catalina.out#" /etc/awslogs/awslogs.conf
 sudo sed -i "s/log_group_name = .*$/log_group_name = oveja/" /etc/awslogs/awslogs.conf
 sudo service awslogs start
-
