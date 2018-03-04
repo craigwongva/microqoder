@@ -1,0 +1,4 @@
+sudo yum install tomcat7 tomcat7-webapps tomcat7-docs-webapp tomcat7-admin-webapps -y
+#I don't care about this today: sudo cp tomcat-users.xml /usr/share/tomcat7/conf/
+sudo service tomcat7 start
+#sudo cp target/green-1.0-SNAPSHOT.war /usr/share/tomcat7/webapps/green.war
