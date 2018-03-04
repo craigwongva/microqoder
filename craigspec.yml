@@ -3,18 +3,12 @@ version: 0.2
 phases:
   install:
     commands:
-#      - echo Hello, CodeBuild Install!
-#      - pwd
-#      - ls
 #      - ./codebuild-ubuntu/install-grails
 # SAve this: Use sh instead of dot when running inside CodeBuild Ubuntu:
 #      - sh install-grails-for-codepipeline
 
   build:
     commands:
-      - echo Hello, CodeBuild Build!
-      - pwd
-      - ls
 #      - /usr/local/share/grails-2.4.0/bin/grails run-app #war #./craig.war > mito
 #why did I switch to mvn from grails?      - mvn clean
 #because 'WAR packaging error' but not much helpful debug info
@@ -23,24 +17,20 @@ phases:
 #      - export JAVA_HOME=/usr/lib/jvm/java
 #      - mvn --version
 #      - mvn grails:war
-      - /usr/local/share/grails-2.4.0/bin/grails create-app Poder  
-      - pwd
-      - cd Poder
-      - /usr/local/share/grails-2.4.0/bin/grails war
-      - pwd
-      - ls
+
+#      - /usr/local/share/grails-2.4.0/bin/grails create-app Poder  
+#      - cd Poder
+#      - /usr/local/share/grails-2.4.0/bin/grails war
   post_build:
     commands:
-      - echo Hello, CodeBuild PostBuild!
-      - pwd
 #messes up dir: it's too /root      - cd ~
-      - cd ..
-      - pwd
+#      - cd ..
+#      - pwd
       - yum install git -y
       - git clone https://github.com/craigwongva/microqoder
       - cd microqoder
       - /usr/local/share/grails-2.4.0/bin/grails war
-      - pwd
+#      - pwd
 
 
 artifacts:
