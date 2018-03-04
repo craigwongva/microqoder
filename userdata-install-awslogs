@@ -1,3 +1,5 @@
+touch /tmp/userdata-install-awslogs-`date "+%Y.%m.%d-%H.%M.%S"`
+
 sudo yum update -y
 sudo yum install -y awslogs
 
