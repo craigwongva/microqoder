@@ -73,4 +73,15 @@ S3 used in craigspec.yml
     Since the CodeBuild occurs inside fridaypipeline and declares
       ..BagArtifact as its output artifact, 
       
-My laptop's Microsoft Edge can't look at S3. But Chrome can.      
+My laptop's Microsoft Edge can't look at S3. But Chrome can. Wait, it looks
+like you can see S3 in Edge if you click from another console page (I forget
+which).
+
+Why doesn't CodeBuild see my changes in craigspec.yml? I'm now having to force
+it by changing the yml name.
+
+Apparently the CloudFormation yml for CodeBuild can only read from
+branch 'master'! So my changes in branch CD-not-CF are never seen :(
+
+I guess I'll have to use minutes.doc 8/11/16's "how to restore a repo to
+a known good state" and always work in 'master'.
