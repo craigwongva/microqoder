@@ -176,7 +176,7 @@ Resources:
               - "aws s3 cp 's3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm' . --region us-east-1\n"
               - "yum -y install codedeploy-agent.noarch.rpm\n"              
               - "yum install git -y\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microqoder'\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone -b CD-to-CF https://github.com/craigwongva/microqoder'\n"
               - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-awslogs'\n"
               - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-tomcat "
 #              - Ref: BucketName 
