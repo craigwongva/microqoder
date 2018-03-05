@@ -193,24 +193,6 @@ Resources:
 #          sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/pfeiffer4gettingstarted.git'
 #          sudo -u ec2-user bash -c '/home/ec2-user/pfeiffer4gettingstarted/userdata'
 
-#Comment these because they are unrelated to us...
-#  myCodeDeployApp:
-#    Type: "AWS::CodeDeploy::Application"
-#    Properties:
-#      ApplicationName: Demo4App
-#  myCodeDeploymentGroup:
-#    Type: "AWS::CodeDeploy::DeploymentGroup"
-#    DependsOn: myCodeDeployApp
-#    DependsOn: CD4ServiceRole
-#    Properties:
-#      ApplicationName: Demo4App
-#      DeploymentConfigName: CodeDeployDefault.AllAtOnce
-#      DeploymentGroupName: DemoAppInstances
-#      Ec2TagFilters:
-#      - Key: Name
-#        Value: Dev4
-#        Type: KEY_AND_VALUE
-#      ServiceRoleArn: "arn:aws:iam::994238729631:role/CD4ServiceRole"
   yourCodeDeployApp:
     Type: "AWS::CodeDeploy::Application"
     Properties:
@@ -240,28 +222,7 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-#Comment the next block because it's not related to us.      
-#            - Name: Source
-#              ActionTypeId:
-#                Category: Source
-#                Owner: ThirdParty
-#                Version: 1
-#                Provider: GitHub
-#              OutputArtifacts:
-#                - Name: MyApp
-#              Configuration:
-#                Owner: craigwongva
-#                Repo: aws-code-deploy-linux
-#                PollForSourceChanges: true
-#                Branch: master
-#                OAuthToken: !Ref githubpassword
-#              RunOrder: 1
-
-###
-#The following stages are imported from simple-pipeline-qoder.yml
-#        - Name: Sourcing
-#          Actions:
-            - Name: GetCraigspec
+            - Name: GetCraigspec #from simple-pipeline-qoder.yml
               ActionTypeId:
                 Category: Source
                 Owner: ThirdParty
@@ -276,12 +237,10 @@ Resources:
               OutputArtifacts:
                 - Name: CraigspecArtifact 
               RunOrder: 2                            
-###
-###
-#The following stages are imported from simple-pipeline-qoder.yml
+
         - Name: StacksValidation
           Actions:
-            - Name: ValidateStacks
+            - Name: ValidateStacks #from simple-pipeline-qoder.yml
               InputArtifacts:
                 - Name: CraigspecArtifact
               ActionTypeId:
@@ -294,22 +253,7 @@ Resources:
               OutputArtifacts:                
                 - Name: BagArtifact                 
               RunOrder: 5
-###
-#Comment because it's unrelated to us...
-#        - Name: Staging
-#          Actions:
-#            - ActionTypeId:
-#                Category: Deploy
-#                Owner: AWS
-#                Version: 1
-#                Provider: CodeDeploy
-#              Configuration:
-#                ApplicationName: Demo4App
-#                DeploymentGroupName: DemoAppInstances
-#              InputArtifacts:
-#                - Name: MyApp
-#              Name: DemoAppInstances
-#              RunOrder: 1
+
         - Name: DeployMe
           Actions:
             - Name: DeployBaguette
