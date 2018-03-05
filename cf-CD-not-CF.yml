@@ -1,0 +1,279 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  githubpassword:
+    Type: String
+Resources:
+###
+#The following resources are imported from simple-pipeline-qoder.yml
+  ArtifactStoreBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+  CodeBuildRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName:
+        Fn::Sub: CodeBuildRole-${AWS::StackName}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "codebuild.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        -
+          PolicyName: "CodeBuildNestedCFNAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              -
+                Effect: "Allow"
+                Action:
+                  - "cloudformation:Get*"
+                  - "cloudformation:Describe*"
+                  - "cloudformation:List*"
+                Resource:
+                  - Fn::Sub: arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Wordpress-${AWS::StackName}*
+              -
+                Effect: "Allow"
+                Action:
+                  - "codecommit:ListBranches"
+                  - "codecommit:ListRepositories"
+                  - "codecommit:BatchGetRepositories"
+                  - "codecommit:Get*"
+                  - "codecommit:GitPull"
+                Resource:
+                  - Fn::Sub: arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:wordpress-build-test
+              -
+                Effect: "Allow"
+                Action:
+                  - "ec2:Describe*"
+                  - "ec2:AuthorizeSecurityGroupIngress"
+                  - "cloudformation:ValidateTemplate"
+                  - "elasticloadbalancing:Describe*"
+                  - "autoscaling:Describe*"
+                  - "iam:Get*"
+                  - "iam:List*"
+                  - "logs:Describe*"
+                  - "logs:Get*"
+                  - "route53:ListResourceRecordSets"
+                  - "tag:Get*"
+                Resource:
+                  - "*"
+              -
+                Effect: "Allow"
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource:
+                  - Fn::Sub: arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+              -
+                Effect: "Allow"
+                Action:
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                  - "s3:GetObjectVersion"
+                  - "s3:ListBucket"
+                Resource:
+                  - Fn::Sub: arn:aws:s3:::codepipeline-${AWS::Region}-*
+                  - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
+                  - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
+  M4CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: M4
+      Description: Run Grails inside a container
+      ServiceRole:
+        Fn::GetAtt: [ CodeBuildRole, Arn ]
+      Artifacts:
+        Type: S3
+        Location: !Ref 'ArtifactStoreBucket'
+        Name: M4DailyArtifact
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: craigwongva/grails240:grails240
+      Source:
+        Location: https://github.com/craigwongva/microqoder
+        BuildSpec: craig2spec.yml
+        Type: GITHUB
+        Auth: 
+          Type: OAUTH
+      TimeoutInMinutes: 5        
+###
+  CD4ServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CD4ServiceRole
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codedeploy.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+  CD4InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+  CD4InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+        - CD2InstanceRole
+      InstanceProfileName: CD5InstanceProfile
+  4c:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: vpc-a0383dc5
+      GroupDescription: 4c
+      SecurityGroupIngress:
+      -
+        CidrIp: 0.0.0.0/0
+        FromPort: 22
+        IpProtocol: tcp
+        ToPort: 22
+      -
+        CidrIp: 173.242.16.106/0
+        FromPort: 8080
+        IpProtocol: tcp
+        ToPort: 8080
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: CD5InstanceProfile
+      KeyName: oregonkeypair
+      SecurityGroupIds:
+      - !Ref 4c
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ""
+            -
+              - "#!/bin/bash -ex\n"
+              - "aws s3 cp 's3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm' . --region us-east-1\n"
+              - "yum -y install codedeploy-agent.noarch.rpm\n"              
+              - "yum install git -y\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microqoder'\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-awslogs'\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-tomcat "
+#              - Ref: BucketName 
+#              - "/"
+#              - Ref: ObjectKey
+              - "'\n"
+      InstanceType: t2.micro
+      ImageId: ami-32d8124a
+      Tags:
+        -
+          Key: Name
+          Value: Dev4
+#          yum install -y git
+#          sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/pfeiffer4gettingstarted.git'
+#          sudo -u ec2-user bash -c '/home/ec2-user/pfeiffer4gettingstarted/userdata'
+
+  yourCodeDeployApp:
+    Type: "AWS::CodeDeploy::Application"
+    Properties:
+      ApplicationName: Demo8App
+  yourCodeDeploymentGroup:
+    Type: "AWS::CodeDeploy::DeploymentGroup"
+    DependsOn: yourCodeDeployApp
+    DependsOn: CD4ServiceRole
+    Properties:
+      ApplicationName: Demo8App
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
+      DeploymentGroupName: Demo8AppInstances
+      Ec2TagFilters:
+      - Key: Name
+        Value: Dev4
+        Type: KEY_AND_VALUE
+      ServiceRoleArn: "arn:aws:iam::994238729631:role/CD4ServiceRole"      
+  fridaypipeline:
+    Type: "AWS::CodePipeline::Pipeline"
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: codepipeline-us-west-2-510060297905
+      Name: OklahomaPipeline
+      RestartExecutionOnUpdate: false
+      RoleArn: "arn:aws:iam::994238729631:role/AWS-CodePipeline-Service"
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GetCraigspec #from simple-pipeline-qoder.yml
+              ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Version: 1
+                Provider: GitHub
+              Configuration:
+                Owner: craigwongva
+                Repo: microqoder
+                PollForSourceChanges: true
+                Branch: master
+                OAuthToken: !Ref githubpassword
+              OutputArtifacts:
+                - Name: CraigspecArtifact 
+              RunOrder: 2                            
+
+        - Name: StacksValidation
+          Actions:
+            - Name: ValidateStacks #from simple-pipeline-qoder.yml
+              InputArtifacts:
+                - Name: CraigspecArtifact
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: M4
+              OutputArtifacts:                
+                - Name: BagArtifact                 
+              RunOrder: 5
+
+        - Name: DeployMe
+          Actions:
+            - Name: DeployBaguette
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CodeDeploy
+                Version: 1            
+              InputArtifacts:
+#                - Name: CraigspecArtifact
+                - Name: BagArtifact
+              Configuration:
+                ApplicationName: Demo8App
+                DeploymentGroupName: Demo8AppInstances
+
+#
+# The roleArn was created manually on the Console
+#  in the CodePipeline service.
+
+# The artifactStore S3 bucket was an output of a previous
+#  manual CodePipeline run. I don't know if it's secure
+#  to continue using that bucket.
+
