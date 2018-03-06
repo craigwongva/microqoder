@@ -144,3 +144,5 @@ arn:aws:logs:us-west-2:994238729631:log-group:oveja:log-stream:i-0576debd2e3287f
 
 next: downscope CD2InstanceRole, which I just gave CloudWatchLogsFullAccess
 next: copy groovy/hello.groovy CloudWatch AWS CLI code
+
+force commit
