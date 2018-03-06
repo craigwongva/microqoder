@@ -107,3 +107,40 @@ Container] 2018/03/06 02:58:41 Expanding foobar
 This occurred because I build3spec.yml was outputting target/Qoder-0.1.war
 but the proper path should be microcero/target/Qoder-0.1.war.
 
+--Tuesday 3/6/18--
+
+If I open cloud9 in us-east-1 by accident, then click to us-west-2, I can't see
+my existing IDE. 
+
+So close the browser, re-login, but go directly to us-west-2 somehow, then
+to Cloud9.
+
+Oh, so sioYGnp conatins build-output.zip which contains Qoder-0.1.war and 
+appspec.yml.
+
+No such file or directory - /opt/codedeploy-agent/deployment-root/0017c249-fce8-4d4f-9034-455c5637f473/d-B4SQEOIQR/deployment-archive/Roder-0.1.war
+
+why Roder? oh, appspec.yml is outdated.
+
+CodeDeploy is succeeding, but the war seems wrong in Tomcat. That is, I looked
+in the S3 bucket content and see a good Qoder-1.0.war, and download to my Desktop
+and upload to S3 and download to my EC2 instance, I put it in /webapps, and it
+expands properly with a candlestick tracer and is accessible over the web.
+
+In contrast, the CD-copied war into /webapps is way too small, like it's
+not a real war.
+
+OK, solved the above by sending to /webapps not /webapps/Toder, which creates
+a Toder dir and hides the war inside that dir, where Tomcat doesn't see it.
+
+2018-03-06 17:01:25,133 - cwlogs.push.publisher - WARNING - 8329 - Thread-3 -
+Caught exception: An error occurred (AccessDeniedException) when 
+calling the PutLogEvents operation: 
+User: arn:aws:sts::994238729631:
+assumed-role/CD2InstanceRole/i-0576debd2e3287fa4 
+is not authorized to perform: 
+logs:PutLogEvents on resource: 
+arn:aws:logs:us-west-2:994238729631:log-group:oveja:log-stream:i-0576debd2e3287fa4
+
+next: downscope CD2InstanceRole, which I just gave CloudWatchLogsFullAccess
+next: copy groovy/hello.groovy CloudWatch AWS CLI code
