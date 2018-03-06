@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - yum install git -y
+      - git clone https://github.com/craigwongva/microqoder
+      - cd microqoder
+      - /usr/local/share/grails-2.4.0/bin/grails war
+
+artifacts:
+  files:
+    - microqoder/target/Qoder-0.1.war
+
+  discard-paths: yes    

@@ -40,27 +40,6 @@ Resources:
                 - 'codebuild:*'
                 Effect: Allow
                 Resource: '*'
-  CFNRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Statement:
-        - Action: ['sts:AssumeRole']
-          Effect: Allow
-          Principal:
-            Service: [cloudformation.amazonaws.com]
-        Version: '2012-10-17'
-      Path: /
-      Policies:
-        - PolicyName: CloudFormationRole
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                  - 'ec2:*'
-                  - 'IAM:PassRole'
-                Effect: Allow
-                Resource: '*'          
   CodeBuildRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -152,7 +131,7 @@ Resources:
         Image: craigwongva/grails240:grails240
       Source:
         Location: https://github.com/craigwongva/microqoder
-        BuildSpec: craig2spec.yml
+        BuildSpec: craig3spec.yml
         Type: GITHUB
         Auth: 
           Type: OAUTH
@@ -199,23 +178,6 @@ Resources:
               OutputArtifacts:                
                 - Name: BagArtifact                 
               RunOrder: 5
-        - Name: DeployMe
-          Actions:
-            - Name: DeployBaguette
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Provider: CloudFormation
-                Version: '1'            
-              InputArtifacts:
-                - Name: CraigspecArtifact
-                - Name: BagArtifact
-              Configuration:
-                ActionMode: CREATE_UPDATE
-                RoleArn: !GetAtt [CFNRole, Arn]
-                StackName: Baguette
-                TemplatePath: CraigspecArtifact::cf-ec2-get-artifact.yml
-                TemplateConfiguration: CraigspecArtifact::cf-ec2-get-artifact-parms.json              
 Outputs:
   artifactStoreBucketOutput:
     Value: !Ref ArtifactStoreBucket
