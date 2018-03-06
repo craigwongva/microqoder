@@ -21,7 +21,7 @@ artifacts:
   files:
 #    - build-output.zip
 #    - appspec.yml
-#    - target/Qoder-0.1.war
-    - foobar
+    - target/Qoder-0.1.war
+#    - foobar
     
   discard-paths: yes    
