@@ -18,6 +18,6 @@ phases:
 
 artifacts:
   files:
-    - microqoder/target/Qoder-0.1.war
+    - build-output.zip    
 
   discard-paths: yes    
