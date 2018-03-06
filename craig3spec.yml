@@ -15,6 +15,7 @@ phases:
       - cd build-output
       - zip -qr build-output.zip ./*
       - mv build-output.zip ../
+      - echo "Foobar"
 
 artifacts:
   files:
