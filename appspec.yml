@@ -1,7 +1,7 @@
 version: 0.0
 os: linux
 files:
-#  - source: Qoder-0.1.war
-#    destination: /usr/share/tomcat7/webapps/Soder.war
+  - source: Qoder-0.1.war
+    destination: /usr/share/tomcat7/webapps/Toder
   - source: /
     destination: /tmp
