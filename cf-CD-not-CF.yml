@@ -84,17 +84,17 @@ Resources:
                   - Fn::Sub: arn:aws:s3:::codepipeline-${AWS::Region}-*
                   - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
                   - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
-  M4CodeBuildProject:
+  M5CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: M4
+      Name: M5
       Description: Run Grails inside a container
       ServiceRole:
         Fn::GetAtt: [ CodeBuildRole, Arn ]
       Artifacts:
         Type: S3
         Location: !Ref 'ArtifactStoreBucket'
-        Name: M4DailyArtifact
+        Name: M5DailyArtifact
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
@@ -215,7 +215,7 @@ Resources:
     Properties:
       ArtifactStore:
         Type: S3
-        Location: codepipeline-us-west-2-510060297905
+        Location: redf4rth-codepipeline-temp #codepipeline-us-west-2-510060297905
       Name: OklahomaPipeline
       RestartExecutionOnUpdate: false
       RoleArn: "arn:aws:iam::994238729631:role/AWS-CodePipeline-Service"
@@ -249,7 +249,7 @@ Resources:
                 Version: 1
                 Provider: CodeBuild
               Configuration:
-                ProjectName: M4
+                ProjectName: M5
               OutputArtifacts:                
                 - Name: BagArtifact                 
               RunOrder: 5

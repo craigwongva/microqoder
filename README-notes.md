@@ -85,3 +85,25 @@ branch 'master'! So my changes in branch CD-not-CF are never seen :(
 
 I guess I'll have to use minutes.doc 8/11/16's "how to restore a repo to
 a known good state" and always work in 'master'.
+
+Maybe this article explains why M4 always can't find craig2spec, even
+when running from master:
+https://aws.amazon.com/blogs/devops/how-to-enable-caching-for-aws-codebuild/
+
+What exactly is read from the cache? How do you turn off CodeBuild caching? 
+
+[Container] 2018/03/06 00:58:53 Waiting for agent ping
+[Container] 2018/03/06 00:58:53 Waiting for DOWNLOAD_SOURCE
+
+This seemed to have been solved by kicking the TV, i.e. this was solved by
+switching from craig2spec.yml to judyspec.yml. I don't know why this helped.
+
+Container] 2018/03/06 02:58:41 Expanding foobar
+[Container] 2018/03/06 02:58:41 Skipping invalid artifact path foobar
+[Container] 2018/03/06 02:58:41 Phase complete: UPLOAD_ARTIFACTS Success: false
+[Container] 2018/03/06 02:58:41 Phase context status code: CLIENT_ERROR Message: No matching artifact paths found
+[Container] 2018/03/06 02:58:44 Runtime error (*errors.errorString: No matching artifact paths found)
+
+This occurred because I build3spec.yml was outputting target/Qoder-0.1.war
+but the proper path should be microcero/target/Qoder-0.1.war.
+
