@@ -1,8 +1,9 @@
 version: 0.0
 
 phases:
-  post_build:
+  build:
     commands:
+      - echo This is craig2spec.yml.
       - yum install git -y
       - git clone https://github.com/craigwongva/microqoder
       - cd microqoder
