@@ -152,7 +152,7 @@ Resources:
         Image: craigwongva/grails240:grails240
       Source:
         Location: https://github.com/craigwongva/microqoder
-        BuildSpec: craigspec.yml
+        BuildSpec: craig2spec.yml
         Type: GITHUB
         Auth: 
           Type: OAUTH
