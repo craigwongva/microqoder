@@ -15,13 +15,13 @@ phases:
       - cd build-output
       - zip -qr build-output.zip ./*
       - mv build-output.zip ../
-      - echo "Foobar"
+      - echo "Foobar5"
 
 artifacts:
   files:
-#    - build-output.zip
+    - microqoder/build-output.zip
 #    - appspec.yml
-    - target/Qoder-0.1.war
+#    - target/Qoder-0.1.war
 #    - foobar
     
   discard-paths: yes    
