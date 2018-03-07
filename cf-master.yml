@@ -173,29 +173,26 @@ Resources:
       Roles:
         - CD2InstanceRole
       InstanceProfileName: CD5InstanceProfile
-  4c:
+  TomcatHostInstanceSecGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: vpc-a0383dc5
-      GroupDescription: 4c
+      GroupDescription: dummy01
       SecurityGroupIngress:
-      -
-        CidrIp: 0.0.0.0/0
+      - CidrIp: 0.0.0.0/0
         FromPort: 22
         IpProtocol: tcp
         ToPort: 22
-      -
-        CidrIp: 173.242.16.106/0
+      - CidrIp: 173.242.16.106/32
         FromPort: 8080
         IpProtocol: tcp
         ToPort: 8080
-  MyInstance:
+  TomcatHostInstance:
     Type: AWS::EC2::Instance
     Properties:
       IamInstanceProfile: CD5InstanceProfile
       KeyName: oregonkeypair
-      SecurityGroupIds:
-      - !Ref 4c
+      SecurityGroupIds: !Ref TomcatHostInstanceSecGrp
       UserData:
         Fn::Base64:
           Fn::Join:
@@ -211,8 +208,7 @@ Resources:
       InstanceType: t2.micro
       ImageId: ami-32d8124a
       Tags:
-        -
-          Key: Name
+        - Key: Name
           Value: Dev4
 
   yourCodeDeployApp:
