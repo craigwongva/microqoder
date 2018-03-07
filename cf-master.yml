@@ -136,9 +136,6 @@ Resources:
         Auth: 
           Type: OAUTH
       TimeoutInMinutes: 5
-
-#added 3/6/18 8am:
-#added CD4InstanceRole, CD4InstanceProfile, 4c, MyInstance at 3/6/18 8:50am
   CD4ServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -210,21 +207,14 @@ Resources:
               - "yum install git -y\n"
               - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microqoder'\n"
               - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-awslogs'\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-tomcat "
-#              - Ref: BucketName 
-#              - "/"
-#              - Ref: ObjectKey
-              - "'\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-tomcat' \n"
       InstanceType: t2.micro
       ImageId: ami-32d8124a
       Tags:
         -
           Key: Name
           Value: Dev4
-#          yum install -y git
-#          sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/pfeiffer4gettingstarted.git'
-#          sudo -u ec2-user bash -c '/home/ec2-user/pfeiffer4gettingstarted/userdata'
-      
+
   yourCodeDeployApp:
     Type: "AWS::CodeDeploy::Application"
     Properties:
@@ -287,8 +277,6 @@ Resources:
               OutputArtifacts:                
                 - Name: BagArtifact                 
               RunOrder: 5
-              
-#added 3/6/18 8am:                    
         - Name: DeployMe
           Actions:
             - Name: DeployBaguette
@@ -298,12 +286,10 @@ Resources:
                 Provider: CodeDeploy
                 Version: 1            
               InputArtifacts:
-#                - Name: CraigspecArtifact
                 - Name: BagArtifact
               Configuration:
                 ApplicationName: Demo8App
                 DeploymentGroupName: Demo8AppInstances
-                
 Outputs:
   artifactStoreBucketOutput:
     Value: !Ref ArtifactStoreBucket

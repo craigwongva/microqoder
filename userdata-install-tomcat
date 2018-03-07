@@ -1,10 +1,5 @@
 cd /home/ec2-user/microqoder
 ./install-tomcat
-sleep 60
-aws configure set s3.signature_version s3v4   #required for KMS encrypted objects
-aws s3 cp s3://$1 mywar.zip --region us-west-2
-unzip mywar.zip
-sudo cp Qoder-0.1.war /usr/share/tomcat7/webapps/Qoder.war
 
 #To verify:
 # sudo tail -f /var/log/tomcat7/catalina.out
