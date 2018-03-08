@@ -8,7 +8,7 @@ Resources:
     Properties:
       VersioningConfiguration:
         Status: Enabled
-  PipelineRole:
+  CPRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -25,21 +25,47 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
-                - 's3:*'
-                - 'cloudformation:CreateStack'
-                - 'cloudformation:DescribeStacks'
-                - 'cloudformation:DeleteStack'
-                - 'cloudformation:UpdateStack'
-                - 'cloudformation:CreateChangeSet'
-                - 'cloudformation:ExecuteChangeSet'
-                - 'cloudformation:DeleteChangeSet'
-                - 'cloudformation:DescribeChangeSet'
-                - 'cloudformation:SetStackPolicy'
-                - 'iam:PassRole'
-                - 'sns:Publish'
-                - 'codebuild:*'
-                Effect: Allow
+                - "s3:*"
+                - "s3:GetObject"
+                - "s3:GetObjectVersion"
+                - "s3:GetBucketVersioning"
+                - "codecommit:CancelUploadArchive"
+                - "codecommit:GetBranch"
+                - "codecommit:GetCommit"
+                - "codecommit:GetUploadArchiveStatus"
+                - "codecommit:UploadArchive"
+                - "codedeploy:CreateDeployment"
+                - "codedeploy:GetApplicationRevision"
+                - "codedeploy:GetDeployment"
+                - "codedeploy:GetDeploymentConfig"
+                - "codedeploy:RegisterApplicationRevision" 
+                - "ec2:*"
+                - "elasticloadbalancing:*"
+                - "autoscaling:*"
+                - "cloudwatch:*"
+                - "iam:PassRole"
+                - "codebuild:*" 
+                - "codebuild:BatchGetBuilds"
+                - "codebuild:StartBuild"                
+                - "cloudformation:*"
+                - "cloudformation:CreateStack"
+                - "cloudformation:DeleteStack"
+                - "cloudformation:DescribeStacks"
+                - "cloudformation:UpdateStack"
+                - "cloudformation:CreateChangeSet"
+                - "cloudformation:DeleteChangeSet"
+                - "cloudformation:DescribeChangeSet"
+                - "cloudformation:ExecuteChangeSet"
+                - "cloudformation:SetStackPolicy"
+                - "cloudformation:ValidateTemplate"
                 Resource: '*'
+                Effect: Allow
+              - Action:
+                - "s3:PutObject"
+                Resource:
+                - "arn:aws:s3:::codepipeline*"
+                - "arn:aws:s3:::elasticbeanstalk*"
+                Effect: Allow
   CodeBuildRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -114,7 +140,7 @@ Resources:
                   - Fn::Sub: arn:aws:s3:::codepipeline-${AWS::Region}-*
                   - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
                   - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
-  MicroqoderCBProjectLabel:
+  CBProjectUnref:
     Type: AWS::CodeBuild::Project
     Properties:
       Name: MicroqoderCBProject
@@ -136,7 +162,7 @@ Resources:
         Auth: 
           Type: OAUTH
       TimeoutInMinutes: 5
-  MicroqoderCDServiceRoleLabel:
+  CDServiceRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: MicroqoderCodeDeployServiceRole
@@ -152,27 +178,12 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: "/"
-#  CD4InstanceRole:
-#    Type: AWS::IAM::Role
-#    Properties:
-#      ManagedPolicyArns:
-#      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy
-#      AssumeRolePolicyDocument:
-#        Version: '2012-10-17'
-#        Statement:
-#        - Effect: Allow
-#          Principal:
-#            Service:
-#            - ec2.amazonaws.com
-#          Action:
-#          - sts:AssumeRole
-#      Path: "/"
-  TomcatEC2InstanceProfileDummy:
+  TomcatEC2InstanceProfileUnref:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
         - CD2InstanceRole
-      InstanceProfileName: TomcatEC2InstanceProfileName
+      InstanceProfileName: TomcatEC2InstanceProfile
   TomcatEC2InstanceSecGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -190,7 +201,7 @@ Resources:
   TomcatEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      IamInstanceProfile: TomcatEC2InstanceProfileName
+      IamInstanceProfile: TomcatEC2InstanceProfile
       KeyName: oregonkeypair
       SecurityGroupIds: 
         - !Ref TomcatEC2InstanceSecGrp
@@ -211,24 +222,23 @@ Resources:
       Tags:
         - Key: Name
           Value: MicroqoderTomcatEC2Instance
-
-  MicroqoderCDAppLabel:
+  CDApp:
     Type: AWS::CodeDeploy::Application
     Properties:
-      ApplicationName: MicroqoderCDApp
-  MicroqoderCDGroupDummy:
+      ApplicationName: CDAppName
+  CDGroupUnref:
     Type: AWS::CodeDeploy::DeploymentGroup
-    DependsOn: MicroqoderCDServiceRoleLabel
-    DependsOn: MicroqoderCDAppLabel    
+    DependsOn: CDServiceRole
+    DependsOn: CDApp    
     Properties:
-      ApplicationName: MicroqoderCDApp
+      ApplicationName: CDAppName
       DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      DeploymentGroupName: MicroqoderCDGroup
+      DeploymentGroupName: CDGroup
       Ec2TagFilters:
         - Key: Name
           Value: MicroqoderTomcatEC2Instance
           Type: KEY_AND_VALUE
-      ServiceRoleArn: !GetAtt [MicroqoderCDServiceRoleLabel, Arn]      
+      ServiceRoleArn: !GetAtt [CDServiceRole, Arn]      
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -237,9 +247,7 @@ Resources:
         Type: S3
       DisableInboundStageTransitions: []
       Name: MicroqoderPipeline
-#replaced 3/6 8:40am
-#      RoleArn: !GetAtt [PipelineRole, Arn]
-      RoleArn: "arn:aws:iam::994238729631:role/AWS-CodePipeline-Service"
+      RoleArn: !GetAtt [CPRole, Arn]
       Stages:
         - Name: Sourcing
           Actions:
@@ -256,8 +264,7 @@ Resources:
                 OAuthToken: !Ref githubpassword
                 PollForSourceChanges: true
               OutputArtifacts:
-                - Name: SourceArtifact 
-              RunOrder: 2              
+                - Name: SourceArtifact
         - Name: BuildStage
           Actions:
             - Name: BuildAction
@@ -272,7 +279,6 @@ Resources:
                 ProjectName: MicroqoderCBProject
               OutputArtifacts:                
                 - Name: BuildArtifact                 
-              RunOrder: 5
         - Name: DeployStage
           Actions:
             - Name: DeployAction
@@ -284,8 +290,8 @@ Resources:
               InputArtifacts:
                 - Name: BuildArtifact
               Configuration:
-                ApplicationName: MicroqoderCDApp
-                DeploymentGroupName: MicroqoderCDGroup
+                ApplicationName: CDAppName
+                DeploymentGroupName: CDGroup
 Outputs:
   artifactStoreBucketOutput:
     Value: !Ref ArtifactStoreBucket
