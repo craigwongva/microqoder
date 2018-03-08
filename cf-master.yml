@@ -90,34 +90,12 @@ Resources:
               -
                 Effect: "Allow"
                 Action:
-                  - "cloudformation:Get*"
-                  - "cloudformation:Describe*"
-                  - "cloudformation:List*"
-                Resource:
-                  - Fn::Sub: arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/Wordpress-${AWS::StackName}*
-              -
-                Effect: "Allow"
-                Action:
-                  - "codecommit:ListBranches"
-                  - "codecommit:ListRepositories"
-                  - "codecommit:BatchGetRepositories"
-                  - "codecommit:Get*"
-                  - "codecommit:GitPull"
-                Resource:
-                  - Fn::Sub: arn:aws:codecommit:${AWS::Region}:${AWS::AccountId}:wordpress-build-test
-              -
-                Effect: "Allow"
-                Action:
                   - "ec2:Describe*"
                   - "ec2:AuthorizeSecurityGroupIngress"
-                  - "cloudformation:ValidateTemplate"
-                  - "elasticloadbalancing:Describe*"
-                  - "autoscaling:Describe*"
                   - "iam:Get*"
                   - "iam:List*"
                   - "logs:Describe*"
                   - "logs:Get*"
-                  - "route53:ListResourceRecordSets"
                   - "tag:Get*"
                 Resource:
                   - "*"
@@ -139,7 +117,7 @@ Resources:
                 Resource:
                   - Fn::Sub: arn:aws:s3:::codepipeline-${AWS::Region}-*
                   - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
-                  - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
+#                  - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
   CBProjectUnref:
     Type: AWS::CodeBuild::Project
     Properties:
