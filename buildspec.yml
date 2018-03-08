@@ -8,20 +8,10 @@ phases:
       - git clone https://github.com/craigwongva/microqoder
       - cd microqoder
       - /usr/local/share/grails-2.4.0/bin/grails war
-      - mkdir -p build-output
-      - cp target/Qoder-0.1.war build-output/
-      - ls
-      - cp appspec.yml build-output/
-      - cd build-output
-      - zip -qr build-output.zip ./*
-      - mv build-output.zip ../
-      - echo "Foobar6"
 
 artifacts:
   files:
-#    - microqoder/build-output.zip
     - microqoder/appspec.yml
     - microqoder/target/Qoder-0.1.war
-#    - foobar
-    
+
   discard-paths: yes    

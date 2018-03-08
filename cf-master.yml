@@ -165,7 +165,6 @@ Resources:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-#        - CD2InstanceRole
         - !Ref TomcatInstanceRole
       InstanceProfileName: TomcatProfile
   TomcatSecGrp:
