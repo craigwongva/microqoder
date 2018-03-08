@@ -133,11 +133,40 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: "/"
+  TomcatInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MicroqoderTomcatInstanceRole
+      #ManagedPolicyArns:
+      #- arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+        -
+          PolicyName: "TomcatInstanceRoleAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"        
+            Statement:
+              - 
+                Effect: "Allow"
+                Action:
+                  - "s3:*"
+                Resource:
+                  - "*"
+      Path: "/"      
   TomcatProfileUnref:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-        - CD2InstanceRole
+#        - CD2InstanceRole
+        - !Ref TomcatInstanceRole
       InstanceProfileName: TomcatProfile
   TomcatSecGrp:
     Type: AWS::EC2::SecurityGroup
