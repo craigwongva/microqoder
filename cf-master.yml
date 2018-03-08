@@ -66,11 +66,11 @@ Resources:
                 - "arn:aws:s3:::codepipeline*"
                 - "arn:aws:s3:::elasticbeanstalk*"
                 Effect: Allow
-  CodeBuildRole:
+  CBRole:
     Type: "AWS::IAM::Role"
     Properties:
       RoleName:
-        Fn::Sub: CodeBuildRole-${AWS::StackName}
+        Fn::Sub: CBRole-${AWS::StackName}
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -117,30 +117,7 @@ Resources:
                 Resource:
                   - Fn::Sub: arn:aws:s3:::codepipeline-${AWS::Region}-*
                   - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
-#                  - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*
-  CBProjectUnref:
-    Type: AWS::CodeBuild::Project
-    Properties:
-      Name: MicroqoderCBProject
-      Description: Build Grails inside Docker
-      ServiceRole:
-        Fn::GetAtt: [ CodeBuildRole, Arn ]
-      Artifacts:
-        Type: S3
-        Location: !Ref ArtifactStoreBucket
-        Name: CodeDeployArtifactDummy
-      Environment:
-        Type: LINUX_CONTAINER
-        ComputeType: BUILD_GENERAL1_SMALL
-        Image: craigwongva/grails240:grails240
-      Source:
-        Location: https://github.com/craigwongva/microqoder
-        BuildSpec: buildspec.yml
-        Type: GITHUB
-        Auth: 
-          Type: OAUTH
-      TimeoutInMinutes: 5
-  CDServiceRole:
+  CDRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: MicroqoderCodeDeployServiceRole
@@ -156,13 +133,13 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: "/"
-  TomcatEC2InstanceProfileUnref:
+  TomcatProfileUnref:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
         - CD2InstanceRole
-      InstanceProfileName: TomcatEC2InstanceProfile
-  TomcatEC2InstanceSecGrp:
+      InstanceProfileName: TomcatProfile
+  TomcatSecGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
       VpcId: vpc-a0383dc5
@@ -176,13 +153,13 @@ Resources:
         FromPort: 8080
         IpProtocol: tcp
         ToPort: 8080
-  TomcatEC2Instance:
+  Tomcat:
     Type: AWS::EC2::Instance
     Properties:
-      IamInstanceProfile: TomcatEC2InstanceProfile
+      IamInstanceProfile: TomcatProfile
       KeyName: oregonkeypair
       SecurityGroupIds: 
-        - !Ref TomcatEC2InstanceSecGrp
+        - !Ref TomcatSecGrp
       UserData:
         Fn::Base64:
           Fn::Join:
@@ -199,14 +176,36 @@ Resources:
       ImageId: ami-32d8124a
       Tags:
         - Key: Name
-          Value: MicroqoderTomcatEC2Instance
+          Value: MicroqoderTomcat
+  CBProjectUnref:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: MicroqoderCBProject
+      Description: Build Grails inside Docker
+      ServiceRole:
+        Fn::GetAtt: [ CBRole, Arn ]
+      Artifacts:
+        Type: S3
+        Location: !Ref ArtifactStoreBucket
+        Name: CodeDeployArtifactDummy
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: craigwongva/grails240:grails240
+      Source:
+        Location: https://github.com/craigwongva/microqoder
+        BuildSpec: buildspec.yml
+        Type: GITHUB
+        Auth: 
+          Type: OAUTH
+      TimeoutInMinutes: 5          
   CDApp:
     Type: AWS::CodeDeploy::Application
     Properties:
       ApplicationName: CDAppName
   CDGroupUnref:
     Type: AWS::CodeDeploy::DeploymentGroup
-    DependsOn: CDServiceRole
+    DependsOn: CDRole
     DependsOn: CDApp    
     Properties:
       ApplicationName: CDAppName
@@ -214,9 +213,9 @@ Resources:
       DeploymentGroupName: CDGroup
       Ec2TagFilters:
         - Key: Name
-          Value: MicroqoderTomcatEC2Instance
+          Value: MicroqoderTomcat
           Type: KEY_AND_VALUE
-      ServiceRoleArn: !GetAtt [CDServiceRole, Arn]      
+      ServiceRoleArn: !GetAtt [CDRole, Arn]      
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
@@ -274,4 +273,4 @@ Outputs:
   artifactStoreBucketOutput:
     Value: !Ref ArtifactStoreBucket
     Export:
-      Name: wordpress-build-test-artifact-store-bucket
+      Name: microqoder-bucket
