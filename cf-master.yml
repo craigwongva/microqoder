@@ -159,7 +159,9 @@ Resources:
                 Action:
                   - "s3:*"
                 Resource:
-                  - "*"
+                  #- "*"
+                  - "arn:aws:s3:::aws-codedeploy-us-east-1/latest/*"
+                  - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*                  
       Path: "/"      
   TomcatProfileUnref:
     Type: AWS::IAM::InstanceProfile
@@ -181,6 +183,10 @@ Resources:
         FromPort: 8080
         IpProtocol: tcp
         ToPort: 8080
+      - CidrIp: 68.100.234.63/32
+        FromPort: 8080
+        IpProtocol: tcp
+        ToPort: 8080        
   Tomcat:
     Type: AWS::EC2::Instance
     Properties:
