@@ -5,12 +5,12 @@ phases:
     commands:
       - yum install git -y
       - git clone https://github.com/craigwongva/microqoder
-      - cd microqoder
+      - cd microqoder/code
       - /usr/local/share/grails-2.4.0/bin/grails war
 
 artifacts:
   files:
     - microqoder/appspec.yml
-    - microqoder/target/Qoder-0.1.war
+    - microqoder/code/target/Qoder-0.1.war
 
   discard-paths: yes    
