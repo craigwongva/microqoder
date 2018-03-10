@@ -42,7 +42,6 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
-                - "codebuild:*" 
                 - "codebuild:BatchGetBuilds"
                 - "codebuild:StartBuild"            
                 - "codedeploy:CreateDeployment"
@@ -52,7 +51,8 @@ Resources:
                 - "codedeploy:RegisterApplicationRevision"
                 - "cloudwatch:*"
                 - "ec2:*"
-                - "iam:PassRole"              
+                - "iam:PassRole" 
+                - "logs:*"
                 - "s3:*"
                 - "s3:GetObject"
                 - "s3:GetObjectVersion"
@@ -135,8 +135,6 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       RoleName: MicroqoderTomcatInstanceRole
-      #ManagedPolicyArns:
-      #- arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -155,9 +153,14 @@ Resources:
               - 
                 Effect: "Allow"
                 Action:
+                  - "logs:*"
+                Resource:
+                  - "*"
+              - 
+                Effect: "Allow"
+                Action:
                   - "s3:*"
                 Resource:
-                  #- "*"
                   - "arn:aws:s3:::aws-codedeploy-us-east-1/latest/*"
                   - Fn::Sub: arn:aws:s3:::${ArtifactStoreBucket}/*                  
       Path: "/"      
@@ -198,12 +201,9 @@ Resources:
             - ""
             -
               - "#!/bin/bash -ex\n"
-              - "aws s3 cp 's3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm' . --region us-east-1\n"
-              - "yum -y install codedeploy-agent.noarch.rpm\n"              
               - "yum install git -y\n"
               - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microqoder'\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-awslogs'\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata-install-tomcat' \n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata/start' \n"
       InstanceType: t2.micro
       ImageId: ami-32d8124a
       Tags:
