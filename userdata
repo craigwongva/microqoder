@@ -1,4 +1,4 @@
-cd /home/ec2-user
+cd /home/ec2-user/microqoder
 ./userdata-install-awslogs
 ./install-codedeploy-agent              
 ./userdata-install-tomcat
