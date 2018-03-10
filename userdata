@@ -1,0 +1,6 @@
+yum install git -y
+cd /home/ec2-user
+git clone https://github.com/craigwongva/microqoder
+./userdata-install-awslogs
+./install-codedeploy-agent              
+./userdata-install-tomcat
