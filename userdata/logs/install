@@ -2,7 +2,7 @@ sudo yum update -y
 sudo yum install -y awslogs
 
 
-cd /home/ec2-user/microqoder
+cd /home/ec2-user/microqoder/userdata/logs
 
 sudo cp awscli.conf  /etc/awslogs/
 #causes awslogs/python? to not work: sudo cp awslogs.conf /etc/awslogs/
