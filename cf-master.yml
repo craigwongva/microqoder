@@ -203,7 +203,7 @@ Resources:
               - "#!/bin/bash -ex\n"
               - "yum install git -y\n"
               - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microqoder'\n"
-              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata/start' \n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata/install' \n"
       InstanceType: t2.micro
       ImageId: ami-32d8124a
       Tags:
