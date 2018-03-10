@@ -3,5 +3,3 @@ os: linux
 files:
   - source: Qoder-0.1.war
     destination: /usr/share/tomcat7/webapps
-  - source: /
-    destination: /tmp
