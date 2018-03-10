@@ -8,6 +8,23 @@ Resources:
     Properties:
       VersioningConfiguration:
         Status: Enabled
+  cpRole: #uses a Managed Policy
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: MicroqoderCodePipelineServiceRole
+      ManagedPolicyArns:
+        #arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+      - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codepipeline.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"        
   CPRole:
     Type: AWS::IAM::Role
     Properties:
@@ -25,28 +42,14 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Action:
-                - "s3:*"
-                - "s3:GetObject"
-                - "s3:GetObjectVersion"
-                - "s3:GetBucketVersioning"
-                - "codecommit:CancelUploadArchive"
-                - "codecommit:GetBranch"
-                - "codecommit:GetCommit"
-                - "codecommit:GetUploadArchiveStatus"
-                - "codecommit:UploadArchive"
+                - "codebuild:*" 
+                - "codebuild:BatchGetBuilds"
+                - "codebuild:StartBuild"            
                 - "codedeploy:CreateDeployment"
                 - "codedeploy:GetApplicationRevision"
                 - "codedeploy:GetDeployment"
                 - "codedeploy:GetDeploymentConfig"
-                - "codedeploy:RegisterApplicationRevision" 
-                - "ec2:*"
-                - "elasticloadbalancing:*"
-                - "autoscaling:*"
-                - "cloudwatch:*"
-                - "iam:PassRole"
-                - "codebuild:*" 
-                - "codebuild:BatchGetBuilds"
-                - "codebuild:StartBuild"                
+                - "codedeploy:RegisterApplicationRevision"
                 - "cloudformation:*"
                 - "cloudformation:CreateStack"
                 - "cloudformation:DeleteStack"
@@ -58,13 +61,19 @@ Resources:
                 - "cloudformation:ExecuteChangeSet"
                 - "cloudformation:SetStackPolicy"
                 - "cloudformation:ValidateTemplate"
+                - "cloudwatch:*"
+                - "ec2:*"
+                - "iam:PassRole"              
+                - "s3:*"
+                - "s3:GetObject"
+                - "s3:GetObjectVersion"
+                - "s3:GetBucketVersioning"              
                 Resource: '*'
                 Effect: Allow
               - Action:
                 - "s3:PutObject"
                 Resource:
                 - "arn:aws:s3:::codepipeline*"
-                - "arn:aws:s3:::elasticbeanstalk*"
                 Effect: Allow
   CBRole:
     Type: "AWS::IAM::Role"
@@ -259,6 +268,7 @@ Resources:
       DisableInboundStageTransitions: []
       Name: MicroqoderPipeline
       RoleArn: !GetAtt [CPRole, Arn]
+#      RoleArn: !GetAtt [cpRole, Arn]
       Stages:
         - Name: Sourcing
           Actions:
