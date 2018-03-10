@@ -1,5 +1,6 @@
 cd /home/ec2-user/microqoder
-./install-tomcat
+sudo yum install tomcat7 tomcat7-webapps tomcat7-docs-webapp tomcat7-admin-webapps -y
+sudo service tomcat7 start
 
 #To verify:
 # sudo tail -f /var/log/tomcat7/catalina.out
