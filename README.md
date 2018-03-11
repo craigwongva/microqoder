@@ -5,6 +5,8 @@ aws cloudformation create-stack --stack-name master \
    --capabilities CAPABILITY_NAMED_IAM 
    --parameter ParameterKey=githubpassword,ParameterValue=REDACTED
 
+sudo pip install boto3
+
 python utilities/delete-versioned-bucket.py \
    `aws cloudformation list-exports --query "Exports[?Name=='microqoder-bucket'].Value" --no-paginate --output text`
 
