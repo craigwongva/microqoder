@@ -19,6 +19,14 @@ https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logStr
 candlestick microcero ae60e50aa53aaa70de799a67f9a38493d05c735b i-0fcd1545bd50ce8b6 2018-03-10:23:44:27.920
 ```
 --
+scripts/_Events.groovy 
+
+    places the sha into META/MANIFEST.MF
+
+conf/BootStrap.groovy 
+
+    uses the sha, i.e. println sha, which appears in the Tomcat log
+--
 ### Friday 2/24/18:
 
 read this more thoroughly:
