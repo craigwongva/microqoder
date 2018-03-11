@@ -1,5 +1,4 @@
-This works in the `master` branch:
-```
+``````
 aws cloudformation create-stack --stack-name master \
    --template-body file://cf.yml 
    --region us-west-2 \
@@ -11,6 +10,12 @@ python utilities/delete-versioned-bucket.py \
 
 aws cloudformation delete-stack --stack-name master --region us-west-2
 
+http://34.211.226.123:8080/Qoder-0.1/
+
+https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logStream:group=oveja;streamFilter=typeLogStreamPrefix
+
+candlestick microcero ae60e50aa53aaa70de799a67f9a38493d05c735b i-0fcd1545bd50ce8b6 2018-03-10:23:44:27.920
+```
 --
 ### Friday 2/24/18:
 
