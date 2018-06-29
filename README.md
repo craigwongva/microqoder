@@ -1,22 +1,47 @@
-``````
+# microqoder
+
+## Motivation
+
+## Screenshots
+
+## Technology/Framework Used
+
+## Features
+
+## Installation
+```
 aws cloudformation create-stack --stack-name master \
    --template-body file://cf.yml 
    --region us-west-2 \
    --capabilities CAPABILITY_NAMED_IAM 
    --parameter ParameterKey=githubpassword,ParameterValue=REDACTED
+```
 
+## Usage
+```
+http://34.211.226.123:8080/Qoder-0.1/
+
+https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logStream:group=oveja;streamFilter=typeLogStreamPrefix
+```
+## Tests
+1. Cloudwatch contains a folder for the new EC2 instance. The log content contains a line like this:
+```
+candlestick microcero ae60e50aa53aaa70de799a67f9a38493d05c735b i-0fcd1545bd50ce8b6 2018-03-10:23:44:27.920
+```
+## Teardown
+```
 sudo pip install boto3
 
 python utilities/delete-versioned-bucket.py \
    `aws cloudformation list-exports --query "Exports[?Name=='microqoder-bucket'].Value" --no-paginate --output text`
 
 aws cloudformation delete-stack --stack-name master --region us-west-2
+```
 
-http://34.211.226.123:8080/Qoder-0.1/
+## Credits
 
-https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logStream:group=oveja;streamFilter=typeLogStreamPrefix
+``````
 
-candlestick microcero ae60e50aa53aaa70de799a67f9a38493d05c735b i-0fcd1545bd50ce8b6 2018-03-10:23:44:27.920
 ```
 --
 scripts/_Events.groovy 
