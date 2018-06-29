@@ -8,23 +8,6 @@ Resources:
     Properties:
       VersioningConfiguration:
         Status: Enabled
-  cpRole: #uses a Managed Policy
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: MicroqoderCodePipelineServiceRole
-      ManagedPolicyArns:
-        #arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
-      - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - codepipeline.amazonaws.com
-          Action:
-          - sts:AssumeRole
-      Path: "/"        
   CPRole:
     Type: AWS::IAM::Role
     Properties:
@@ -118,7 +101,8 @@ Resources:
   CDRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: MicroqoderCodeDeployServiceRole
+      RoleName: 
+        Fn::Sub: MicroqoderCodeDeployServiceRole-${AWS::StackName}
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
       AssumeRolePolicyDocument:
@@ -134,7 +118,8 @@ Resources:
   TomcatInstanceRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: MicroqoderTomcatInstanceRole
+      RoleName:
+        Fn::Sub: MicroqoderTomcatInstanceRole-${AWS::StackName}
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -169,7 +154,8 @@ Resources:
     Properties:
       Roles:
         - !Ref TomcatInstanceRole
-      InstanceProfileName: TomcatProfile
+      InstanceProfileName: 
+        Fn::Sub: TomcatProfile-${AWS::StackName}
   TomcatSecGrp:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -191,7 +177,8 @@ Resources:
   Tomcat:
     Type: AWS::EC2::Instance
     Properties:
-      IamInstanceProfile: TomcatProfile
+      IamInstanceProfile: 
+        Fn::Sub: TomcatProfile-${AWS::StackName}
       KeyName: oregonkeypair
       SecurityGroupIds: 
         - !Ref TomcatSecGrp
@@ -212,7 +199,8 @@ Resources:
   CBProjectUnref:
     Type: AWS::CodeBuild::Project
     Properties:
-      Name: MicroqoderCBProject
+      Name: 
+        Fn::Sub: MicroqoderCBProject-${AWS::StackName}
       Description: Build Grails inside Docker
       ServiceRole:
         Fn::GetAtt: [ CBRole, Arn ]
@@ -234,15 +222,18 @@ Resources:
   CDApp:
     Type: AWS::CodeDeploy::Application
     Properties:
-      ApplicationName: CDAppName
+      ApplicationName: 
+        Fn::Sub: CDAppName-${AWS::StackName}
   CDGroupUnref:
     Type: AWS::CodeDeploy::DeploymentGroup
     DependsOn: CDRole
     DependsOn: CDApp    
     Properties:
-      ApplicationName: CDAppName
+      ApplicationName: 
+        Fn::Sub: CDAppName-${AWS::StackName}
       DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      DeploymentGroupName: CDGroup
+      DeploymentGroupName: 
+        Fn::Sub: CDGroup-${AWS::StackName}
       Ec2TagFilters:
         - Key: Name
           Value: MicroqoderTomcat
@@ -255,9 +246,9 @@ Resources:
         Location: !Ref ArtifactStoreBucket
         Type: S3
       DisableInboundStageTransitions: []
-      Name: MicroqoderPipeline
+      Name: 
+        Fn::Sub: MicroqoderPipeline-${AWS::StackName}
       RoleArn: !GetAtt [CPRole, Arn]
-#      RoleArn: !GetAtt [cpRole, Arn]
       Stages:
         - Name: Sourcing
           Actions:
@@ -286,7 +277,8 @@ Resources:
                 Version: 1
                 Provider: CodeBuild
               Configuration:
-                ProjectName: MicroqoderCBProject
+                ProjectName: 
+                  Fn::Sub: MicroqoderCBProject-${AWS::StackName}
               OutputArtifacts:                
                 - Name: BuildArtifact                 
         - Name: DeployStage
@@ -300,10 +292,13 @@ Resources:
               InputArtifacts:
                 - Name: BuildArtifact
               Configuration:
-                ApplicationName: CDAppName
-                DeploymentGroupName: CDGroup
+                ApplicationName: 
+                  Fn::Sub: CDAppName-${AWS::StackName}
+                DeploymentGroupName: 
+                  Fn::Sub: CDGroup-${AWS::StackName}
 Outputs:
   artifactStoreBucketOutput:
     Value: !Ref ArtifactStoreBucket
     Export:
-      Name: microqoder-bucket
+      Name: 
+        Fn::Sub: microqoder-bucket-${AWS::StackName}
