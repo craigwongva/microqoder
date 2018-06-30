@@ -174,7 +174,7 @@ Resources:
         FromPort: 8080
         IpProtocol: tcp
         ToPort: 8080        
-  Tomcat:
+  StageEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       IamInstanceProfile: 
@@ -196,7 +196,30 @@ Resources:
       Tags:
         - Key: Name
           Value: 
-            Fn::Sub: MicroqoderTomcat-${AWS::StackName}
+            Fn::Sub: MicroqoderStageEC2Instance-${AWS::StackName}
+  ProdEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: 
+        Fn::Sub: TomcatProfile-${AWS::StackName}
+      KeyName: oregonkeypair
+      SecurityGroupIds: 
+        - !Ref TomcatSecGrp
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+            - ""
+            -
+              - "#!/bin/bash -ex\n"
+              - "yum install git -y\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user; git clone https://github.com/craigwongva/microqoder'\n"
+              - "sudo -u ec2-user bash -c 'cd /home/ec2-user/microqoder; ./userdata/install' \n"
+      InstanceType: t2.micro
+      ImageId: ami-32d8124a
+      Tags:
+        - Key: Name
+          Value: 
+            Fn::Sub: MicroqoderProdEC2Instance-${AWS::StackName}
   CBProjectUnref:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -238,7 +261,23 @@ Resources:
       Ec2TagFilters:
         - Key: Name
           Value: 
-            Fn::Sub: MicroqoderTomcat-${AWS::StackName}
+            Fn::Sub: MicroqoderStageEC2Instance-${AWS::StackName}
+          Type: KEY_AND_VALUE
+      ServiceRoleArn: !GetAtt [CDRole, Arn]      
+  CDGroupProdUnref:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    DependsOn: CDRole
+    DependsOn: CDApp    
+    Properties:
+      ApplicationName: 
+        Fn::Sub: CDAppName-${AWS::StackName}
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
+      DeploymentGroupName: 
+        Fn::Sub: CDGroupProd-${AWS::StackName}
+      Ec2TagFilters:
+        - Key: Name
+          Value: 
+            Fn::Sub: MicroqoderProdEC2Instance-${AWS::StackName}
           Type: KEY_AND_VALUE
       ServiceRoleArn: !GetAtt [CDRole, Arn]      
   Pipeline:
@@ -285,7 +324,7 @@ Resources:
                 - Name: BuildArtifact                 
         - Name: DeployStage
           Actions:
-            - Name: DeployAction
+            - Name: DeployActionStage
               ActionTypeId:
                 Category: Deploy
                 Owner: AWS
@@ -298,6 +337,29 @@ Resources:
                   Fn::Sub: CDAppName-${AWS::StackName}
                 DeploymentGroupName: 
                   Fn::Sub: CDGroup-${AWS::StackName}
+        - Name: ApproveProd
+          Actions:
+            - Name: ApproveActionProd
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: 1            
+        - Name: DeployProd
+          Actions:
+            - Name: DeployActionProd
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CodeDeploy
+                Version: 1            
+              InputArtifacts:
+                - Name: BuildArtifact
+              Configuration:
+                ApplicationName: 
+                  Fn::Sub: CDAppName-${AWS::StackName}
+                DeploymentGroupName: 
+                  Fn::Sub: CDGroupProd-${AWS::StackName}
 Outputs:
   artifactStoreBucketOutput:
     Value: !Ref ArtifactStoreBucket
