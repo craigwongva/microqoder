@@ -195,7 +195,8 @@ Resources:
       ImageId: ami-32d8124a
       Tags:
         - Key: Name
-          Value: MicroqoderTomcat
+          Value: 
+            Fn::Sub: MicroqoderTomcat-${AWS::StackName}
   CBProjectUnref:
     Type: AWS::CodeBuild::Project
     Properties:
@@ -236,7 +237,8 @@ Resources:
         Fn::Sub: CDGroup-${AWS::StackName}
       Ec2TagFilters:
         - Key: Name
-          Value: MicroqoderTomcat
+          Value: 
+            Fn::Sub: MicroqoderTomcat-${AWS::StackName}
           Type: KEY_AND_VALUE
       ServiceRoleArn: !GetAtt [CDRole, Arn]      
   Pipeline:
