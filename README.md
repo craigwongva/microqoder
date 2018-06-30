@@ -17,17 +17,18 @@ aws cloudformation create-stack --stack-name master \
    --parameter ParameterKey=githubpassword,ParameterValue=REDACTED
 ```
 
-## Usage
-```
-http://34.211.226.123:8080/Qoder-0.1/
-
-https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logStream:group=oveja;streamFilter=typeLogStreamPrefix
-```
 ## Tests
-1. Cloudwatch contains a folder for the new EC2 instance. The log content contains a line like this:
 ```
+Without any special testing action, look in here for your new EC2 instances (Stage, Prod) files:
+https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logStream:group=oveja
+
+Near the bottom of the file should be:
+
 candlestick microcero ae60e50aa53aaa70de799a67f9a38493d05c735b i-0fcd1545bd50ce8b6 2018-03-10:23:44:27.920
 ```
+## Usage
+http://34.211.226.123:8080/Qoder-0.1/, but actually you don't need to visit the URL.
+
 ## Teardown
 ```
 sudo pip install boto3
