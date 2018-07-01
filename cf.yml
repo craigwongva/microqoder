@@ -243,6 +243,29 @@ Resources:
         Auth: 
           Type: OAUTH
       TimeoutInMinutes: 5          
+  CBProjectUnrefSunday:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: 
+        Fn::Sub: MicroqoderCBProjectSunday-${AWS::StackName}
+      Description: Build Grails inside Docker
+      ServiceRole:
+        Fn::GetAtt: [ CBRole, Arn ]
+      Artifacts:
+        Type: S3
+        Location: !Ref ArtifactStoreBucket
+        Name: CodeDeployArtifactDummy
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: craigwongva/grails240:grails240
+      Source:
+        Location: https://github.com/craigwongva/microqoder
+        BuildSpec: buildspecsunday.yml
+        Type: GITHUB
+        Auth: 
+          Type: OAUTH
+      TimeoutInMinutes: 5          
   CDApp:
     Type: AWS::CodeDeploy::Application
     Properties:
@@ -309,6 +332,7 @@ Resources:
                 - Name: SourceArtifact
         - Name: BuildStage
           Actions:
+            # BuildAction builds. It doesn't test.
             - Name: BuildAction
               InputArtifacts:
                 - Name: SourceArtifact
@@ -322,6 +346,32 @@ Resources:
                   Fn::Sub: MicroqoderCBProject-${AWS::StackName}
               OutputArtifacts:                
                 - Name: BuildArtifact                 
+
+        # This stage is a demo only, in response to
+        # https://aws.amazon.com/about-aws/whats-new/2017/03/aws-codepipeline-adds-support-for-unit-testing/
+        # It does nothing meaningful.
+        - Name: TestStage
+          Actions:
+            - Name: TestAction
+              InputArtifacts:
+                 # This artifact must match the buildspec.yml below, even
+                 # though buildspec.yml also explicitly lists the sourc
+                 # repo.
+                 # The build step's OutputArtifacts above don't seem to
+                 # be valid as an InputArtifact. I'm not sure how to access
+                 # the build artifacts, so I don't know how to do meaningful
+                 # tests in this stage (other than first writing build
+                 # artifacts to and reading from a Nexus-like S3).
+                - Name: SourceArtifact 
+              ActionTypeId:
+                Category: Test
+                Owner: AWS
+                Version: 1
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: 
+                  Fn::Sub: MicroqoderCBProjectSunday-${AWS::StackName} 
+
         - Name: DeployStage
           Actions:
             - Name: DeployActionStage
