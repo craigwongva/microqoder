@@ -3,8 +3,10 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo SUNDAY3 I AM PRIVILEGED TO LEARN 
-      - ls doesntexist
+      - echo SUNDAY4 I AM PRIVILEGED TO LEARN 
+      # Simulate a test by returning rc==0:
+      - ls
+
 #      - yum install git -y
 #      - git clone https://github.com/craigwongva/microqoder
 #      - cd microqoder/code

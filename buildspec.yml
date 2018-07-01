@@ -7,6 +7,8 @@ phases:
       - git clone https://github.com/craigwongva/microqoder
       - cd microqoder/code
       - /usr/local/share/grails-2.4.0/bin/grails war
+      # Simulate a test by returning rc==0:
+      - ls
 
 artifacts:
   files:
