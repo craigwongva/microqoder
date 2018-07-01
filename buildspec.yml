@@ -7,6 +7,7 @@ phases:
       - git clone https://github.com/craigwongva/microqoder
       - cd microqoder/code
       - /usr/local/share/grails-2.4.0/bin/grails war
+      - ls -al doesntexist
 
 artifacts:
   files:
