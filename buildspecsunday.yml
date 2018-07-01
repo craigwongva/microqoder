@@ -1,0 +1,13 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo SUNDAY I AM PRIVILEGED TO LEARN 
+
+#artifacts:
+#  files:
+#    - microqoder/appspec.yml
+#    - microqoder/code/target/Qoder-0.1.war
+
+  discard-paths: yes    
