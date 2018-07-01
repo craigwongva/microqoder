@@ -11,9 +11,9 @@
 ## Installation
 ```
 aws cloudformation create-stack --stack-name master \
-   --template-body file://cf.yml 
+   --template-body file://cf.yml \
    --region us-west-2 \
-   --capabilities CAPABILITY_NAMED_IAM 
+   --capabilities CAPABILITY_NAMED_IAM \
    --parameter ParameterKey=githubpassword,ParameterValue=REDACTED
 ```
 
