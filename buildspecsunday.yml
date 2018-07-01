@@ -3,7 +3,13 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo SUNDAY I AM PRIVILEGED TO LEARN 
+      - echo SUNDAY2 I AM PRIVILEGED TO LEARN 
+      - pwd
+      - ls
+#      - yum install git -y
+#      - git clone https://github.com/craigwongva/microqoder
+#      - cd microqoder/code
+#      - /usr/local/share/grails-2.4.0/bin/grails war
 
 #artifacts:
 #  files:
