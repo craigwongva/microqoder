@@ -3,9 +3,8 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo SUNDAY2 I AM PRIVILEGED TO LEARN 
-      - pwd
-      - ls
+      - echo SUNDAY3 I AM PRIVILEGED TO LEARN 
+      - ls doesntexist
 #      - yum install git -y
 #      - git clone https://github.com/craigwongva/microqoder
 #      - cd microqoder/code
